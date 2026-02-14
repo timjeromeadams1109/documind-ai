@@ -25,17 +25,19 @@
         * { transition: all 0.2s ease; }
         .glass { backdrop-filter: blur(12px); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
         .gradient-text { background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .gradient-border { position: relative; }
-        .gradient-border::before { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
-        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); } 50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.6); } }
-        input:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); }
         .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
         .btn-primary:hover { background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%); transform: translateY(-1px); box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3); }
         .file-drop { border: 2px dashed rgba(99, 102, 241, 0.4); }
         .file-drop:hover, .file-drop.dragover { border-color: #6366f1; background: rgba(99, 102, 241, 0.1); }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); } 50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.6); } }
+        input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); }
+        .typing-cursor::after { content: '▋'; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1.5em; }
+        .stream-text { white-space: pre-wrap; line-height: 1.7; }
     </style>
 </head>
 <body class="bg-dark-950 text-gray-100 font-sans min-h-screen">
@@ -100,16 +102,16 @@
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold mb-3">Upload Anything</h3>
-                        <p class="text-gray-400">Support for TXT, MD, JSON, CSV, and more. Just drag and drop.</p>
+                        <p class="text-gray-400">Support for TXT, MD, JSON, CSV, and more. Handles large files with smart chunking.</p>
                     </div>
                     <div class="glass rounded-2xl p-8">
                         <div class="w-14 h-14 rounded-xl bg-purple-500/20 flex items-center justify-center mb-6">
                             <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold mb-3">Custom Instructions</h3>
-                        <p class="text-gray-400">Tell the AI exactly what to look for. Natural language, no coding needed.</p>
+                        <h3 class="text-xl font-semibold mb-3">Multiple AI Models</h3>
+                        <p class="text-gray-400">Choose the right AI for your task—Mistral for general, DeepSeek for code analysis.</p>
                     </div>
                     <div class="glass rounded-2xl p-8">
                         <div class="w-14 h-14 rounded-xl bg-pink-500/20 flex items-center justify-center mb-6">
@@ -117,8 +119,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold mb-3">Instant Results</h3>
-                        <p class="text-gray-400">Powered by local AI. Fast, private, and always available.</p>
+                        <h3 class="text-xl font-semibold mb-3">Real-Time Streaming</h3>
+                        <p class="text-gray-400">Watch the AI think in real-time with streaming responses. No waiting.</p>
                     </div>
                 </div>
             </div>
@@ -129,28 +131,19 @@
                     <div class="glass rounded-3xl p-10">
                         <h2 class="text-3xl font-bold mb-2">Welcome back</h2>
                         <p class="text-gray-400 mb-8">Sign in to continue to DocuMind</p>
-
                         <form id="login-form" onsubmit="handleLogin(event)">
                             <div class="space-y-5">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
-                                    <input type="text" id="login-username" required
-                                        class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none"
-                                        placeholder="Enter username">
+                                    <input type="text" id="login-username" required class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none" placeholder="Enter username">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                                    <input type="password" id="login-password" required
-                                        class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none"
-                                        placeholder="Enter password">
+                                    <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none" placeholder="Enter password">
                                 </div>
                             </div>
-
-                            <button type="submit" class="w-full mt-8 px-6 py-4 rounded-xl btn-primary text-white font-semibold text-lg">
-                                Sign In
-                            </button>
+                            <button type="submit" class="w-full mt-8 px-6 py-4 rounded-xl btn-primary text-white font-semibold text-lg">Sign In</button>
                         </form>
-
                         <div class="mt-6 text-center">
                             <button onclick="showPage('forgot')" class="text-primary-400 hover:text-primary-300">Forgot password?</button>
                         </div>
@@ -167,34 +160,23 @@
                     <div class="glass rounded-3xl p-10">
                         <h2 class="text-3xl font-bold mb-2">Create account</h2>
                         <p class="text-gray-400 mb-8">Start analyzing documents in seconds</p>
-
                         <form id="register-form" onsubmit="handleRegister(event)">
                             <div class="space-y-5">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
-                                    <input type="text" id="reg-username" required
-                                        class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none"
-                                        placeholder="Choose a username">
+                                    <input type="text" id="reg-username" required class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none" placeholder="Choose a username">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                                    <input type="email" id="reg-email" required
-                                        class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none"
-                                        placeholder="you@example.com">
+                                    <input type="email" id="reg-email" required class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none" placeholder="you@example.com">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                                    <input type="password" id="reg-password" required minlength="6"
-                                        class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none"
-                                        placeholder="Min 6 characters">
+                                    <input type="password" id="reg-password" required minlength="6" class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none" placeholder="Min 6 characters">
                                 </div>
                             </div>
-
-                            <button type="submit" class="w-full mt-8 px-6 py-4 rounded-xl btn-primary text-white font-semibold text-lg">
-                                Create Account
-                            </button>
+                            <button type="submit" class="w-full mt-8 px-6 py-4 rounded-xl btn-primary text-white font-semibold text-lg">Create Account</button>
                         </form>
-
                         <div class="mt-6 text-center text-gray-400">
                             Already have an account? <button onclick="showPage('login')" class="text-primary-400 hover:text-primary-300">Sign in</button>
                         </div>
@@ -208,28 +190,18 @@
                     <div class="glass rounded-3xl p-10">
                         <h2 class="text-3xl font-bold mb-2">Reset password</h2>
                         <p class="text-gray-400 mb-8">Enter your email to get a reset token</p>
-
                         <form id="forgot-form" onsubmit="handleForgot(event)">
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                                <input type="email" id="forgot-email" required
-                                    class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none"
-                                    placeholder="you@example.com">
+                                <input type="email" id="forgot-email" required class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none" placeholder="you@example.com">
                             </div>
-
-                            <button type="submit" class="w-full mt-8 px-6 py-4 rounded-xl btn-primary text-white font-semibold text-lg">
-                                Get Reset Token
-                            </button>
+                            <button type="submit" class="w-full mt-8 px-6 py-4 rounded-xl btn-primary text-white font-semibold text-lg">Get Reset Token</button>
                         </form>
-
                         <div id="reset-token-display" class="hidden mt-6 p-4 rounded-xl bg-green-500/20 border border-green-500/30">
                             <p class="text-green-400 text-sm mb-2">Your reset token:</p>
-                            <code id="reset-token-value" class="text-white break-all"></code>
-                            <button onclick="showPage('reset')" class="mt-4 w-full px-4 py-2 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30">
-                                Use Token to Reset Password
-                            </button>
+                            <code id="reset-token-value" class="text-white break-all text-sm"></code>
+                            <button onclick="showPage('reset')" class="mt-4 w-full px-4 py-2 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30">Use Token</button>
                         </div>
-
                         <div class="mt-6 text-center">
                             <button onclick="showPage('login')" class="text-gray-400 hover:text-white">Back to login</button>
                         </div>
@@ -243,26 +215,18 @@
                     <div class="glass rounded-3xl p-10">
                         <h2 class="text-3xl font-bold mb-2">Set new password</h2>
                         <p class="text-gray-400 mb-8">Enter your reset token and new password</p>
-
                         <form id="reset-form" onsubmit="handleReset(event)">
                             <div class="space-y-5">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Reset Token</label>
-                                    <input type="text" id="reset-token" required
-                                        class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none"
-                                        placeholder="Paste your reset token">
+                                    <input type="text" id="reset-token" required class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none" placeholder="Paste your reset token">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">New Password</label>
-                                    <input type="password" id="reset-password" required minlength="6"
-                                        class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none"
-                                        placeholder="Enter new password">
+                                    <input type="password" id="reset-password" required minlength="6" class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none" placeholder="Enter new password">
                                 </div>
                             </div>
-
-                            <button type="submit" class="w-full mt-8 px-6 py-4 rounded-xl btn-primary text-white font-semibold text-lg">
-                                Reset Password
-                            </button>
+                            <button type="submit" class="w-full mt-8 px-6 py-4 rounded-xl btn-primary text-white font-semibold text-lg">Reset Password</button>
                         </form>
                     </div>
                 </div>
@@ -272,7 +236,7 @@
             <div id="page-dashboard" class="page hidden fade-in">
                 <div class="mb-10">
                     <h1 class="text-4xl font-bold mb-2">Document Analysis</h1>
-                    <p class="text-gray-400">Upload a document and tell the AI what to analyze</p>
+                    <p class="text-gray-400">Upload a document, choose your AI model, and get real-time analysis</p>
                 </div>
 
                 <div class="grid lg:grid-cols-2 gap-8">
@@ -284,30 +248,31 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                                 </svg>
                             </div>
-                            Upload Document
+                            Upload & Configure
                         </h3>
 
-                        <div id="drop-zone" class="file-drop rounded-2xl p-10 text-center cursor-pointer"
+                        <!-- File Upload -->
+                        <div id="drop-zone" class="file-drop rounded-2xl p-8 text-center cursor-pointer mb-6"
                             onclick="document.getElementById('file-input').click()"
                             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                            <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)" accept=".txt,.md,.json,.csv,.xml,.html,.py,.js,.ts">
-                            <svg class="w-16 h-16 mx-auto text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)" accept=".txt,.md,.json,.csv,.xml,.html,.py,.js,.ts,.jsx,.tsx,.go,.rs,.java,.c,.cpp,.h">
+                            <svg class="w-12 h-12 mx-auto text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
-                            <p class="text-gray-400 mb-2">Drag & drop or click to upload</p>
-                            <p class="text-gray-500 text-sm">TXT, MD, JSON, CSV, and more</p>
+                            <p class="text-gray-400 mb-1">Drag & drop or click to upload</p>
+                            <p class="text-gray-500 text-sm">Supports large files with smart chunking</p>
                         </div>
 
-                        <div id="file-info" class="hidden mt-4 p-4 rounded-xl bg-primary-500/10 border border-primary-500/20">
+                        <div id="file-info" class="hidden mb-6 p-4 rounded-xl bg-primary-500/10 border border-primary-500/20">
                             <div class="flex items-center gap-3">
-                                <svg class="w-8 h-8 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-8 h-8 text-primary-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
-                                <div>
-                                    <p id="file-name" class="font-medium"></p>
+                                <div class="min-w-0 flex-1">
+                                    <p id="file-name" class="font-medium truncate"></p>
                                     <p id="file-size" class="text-sm text-gray-400"></p>
                                 </div>
-                                <button onclick="clearFile()" class="ml-auto text-gray-400 hover:text-red-400">
+                                <button onclick="clearFile()" class="text-gray-400 hover:text-red-400 flex-shrink-0">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -315,18 +280,47 @@
                             </div>
                         </div>
 
-                        <div class="mt-6">
+                        <!-- Model Selection -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-300 mb-3">AI Model</label>
+                            <select id="model-select" class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none appearance-none cursor-pointer pr-10">
+                                <option value="mistral:latest">🧠 Mistral 7B — Best for general analysis & business docs</option>
+                                <option value="llama3.2:latest">⚡ Llama 3.2 — Balanced, good for most tasks</option>
+                                <option value="deepseek-coder:6.7b">💻 DeepSeek Coder — Code review & technical analysis</option>
+                            </select>
+                        </div>
+
+                        <!-- Instructions -->
+                        <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-300 mb-3">Analysis Instructions</label>
-                            <textarea id="instructions" rows="4"
+                            <textarea id="instructions" rows="3"
                                 class="w-full px-4 py-3 rounded-xl bg-dark-900 border border-gray-700 focus:border-primary-500 outline-none resize-none"
-                                placeholder="Tell the AI what to analyze, extract, or summarize..."></textarea>
+                                placeholder="Examples: 'Summarize key points', 'Extract all numbers', 'Find security issues', 'List action items'"></textarea>
+                        </div>
+
+                        <!-- Quick Templates -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Quick Templates</label>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="setTemplate('Summarize the main points and key takeaways')" class="px-3 py-1.5 rounded-lg bg-dark-900 border border-gray-700 text-sm text-gray-300 hover:border-primary-500 hover:text-primary-400">📝 Summarize</button>
+                                <button onclick="setTemplate('Extract all numerical data, statistics, and metrics')" class="px-3 py-1.5 rounded-lg bg-dark-900 border border-gray-700 text-sm text-gray-300 hover:border-primary-500 hover:text-primary-400">📊 Extract Data</button>
+                                <button onclick="setTemplate('Identify risks, issues, and areas of concern')" class="px-3 py-1.5 rounded-lg bg-dark-900 border border-gray-700 text-sm text-gray-300 hover:border-primary-500 hover:text-primary-400">⚠️ Find Risks</button>
+                                <button onclick="setTemplate('Review this code for bugs, security issues, and improvements')" class="px-3 py-1.5 rounded-lg bg-dark-900 border border-gray-700 text-sm text-gray-300 hover:border-primary-500 hover:text-primary-400">🔍 Code Review</button>
+                                <button onclick="setTemplate('Convert this to a structured JSON format')" class="px-3 py-1.5 rounded-lg bg-dark-900 border border-gray-700 text-sm text-gray-300 hover:border-primary-500 hover:text-primary-400">{ } To JSON</button>
+                            </div>
+                        </div>
+
+                        <!-- Streaming Toggle -->
+                        <div class="mb-6 flex items-center gap-3">
+                            <input type="checkbox" id="stream-toggle" checked class="w-5 h-5 rounded bg-dark-900 border-gray-700 text-primary-500 focus:ring-primary-500 cursor-pointer">
+                            <label for="stream-toggle" class="text-sm text-gray-300 cursor-pointer">Enable real-time streaming</label>
                         </div>
 
                         <button id="analyze-btn" onclick="analyzeDocument()" disabled
-                            class="w-full mt-6 px-6 py-4 rounded-xl btn-primary text-white font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                            class="w-full px-6 py-4 rounded-xl btn-primary text-white font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2">
                             <span id="analyze-text">Analyze Document</span>
                             <span id="analyze-loading" class="hidden">
-                                <svg class="animate-spin h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24">
+                                <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
@@ -335,7 +329,7 @@
                     </div>
 
                     <!-- Results Section -->
-                    <div class="glass rounded-3xl p-8">
+                    <div class="glass rounded-3xl p-8 flex flex-col">
                         <h3 class="text-xl font-semibold mb-6 flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
                                 <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,19 +337,30 @@
                                 </svg>
                             </div>
                             Analysis Results
+                            <span id="model-badge" class="hidden ml-auto text-xs px-2 py-1 rounded-full bg-primary-500/20 text-primary-400"></span>
                         </h3>
 
-                        <div id="results-placeholder" class="text-center py-16">
-                            <svg class="w-20 h-20 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                            </svg>
-                            <p class="text-gray-500">Upload a document and provide instructions to see AI analysis</p>
+                        <div id="results-placeholder" class="flex-1 flex items-center justify-center">
+                            <div class="text-center py-10">
+                                <svg class="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                </svg>
+                                <p class="text-gray-500">Upload a document and provide<br>instructions to see AI analysis</p>
+                            </div>
                         </div>
 
-                        <div id="results-content" class="hidden">
-                            <div class="prose prose-invert max-w-none">
-                                <div id="analysis-output" class="text-gray-300 leading-relaxed whitespace-pre-wrap"></div>
-                            </div>
+                        <div id="results-content" class="hidden flex-1 overflow-auto">
+                            <div id="analysis-output" class="stream-text text-gray-300"></div>
+                        </div>
+
+                        <!-- Copy Button -->
+                        <div id="copy-section" class="hidden mt-4 pt-4 border-t border-gray-700/50">
+                            <button onclick="copyResults()" class="flex items-center gap-2 text-sm text-gray-400 hover:text-primary-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                Copy to clipboard
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -364,7 +369,7 @@
         </main>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast -->
     <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
         <div class="glass rounded-xl px-6 py-4 flex items-center gap-3">
             <span id="toast-icon"></span>
@@ -377,18 +382,16 @@
         let authToken = localStorage.getItem('token');
         let currentFile = null;
 
-        // Page Navigation
         function showPage(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`page-${page}`).classList.remove('hidden');
-            document.getElementById(`page-${page}`).classList.add('fade-in');
+            const el = document.getElementById(`page-${page}`);
+            el.classList.remove('hidden');
+            el.classList.add('fade-in');
         }
 
         function updateNav() {
             const links = document.getElementById('nav-links');
             const user = document.getElementById('nav-user');
-            const userName = document.getElementById('user-name');
-
             if (authToken) {
                 links.classList.add('hidden');
                 user.classList.remove('hidden');
@@ -402,9 +405,7 @@
 
         async function fetchUser() {
             try {
-                const res = await fetch(`${API}/auth/me`, {
-                    headers: { 'Authorization': `Bearer ${authToken}` }
-                });
+                const res = await fetch(`${API}/auth/me`, { headers: { 'Authorization': `Bearer ${authToken}` } });
                 if (res.ok) {
                     const data = await res.json();
                     document.getElementById('user-name').textContent = data.username;
@@ -412,19 +413,16 @@
             } catch (e) {}
         }
 
-        // Auth Handlers
         async function handleLogin(e) {
             e.preventDefault();
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
-
             try {
                 const res = await fetch(`${API}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
                 });
-
                 const data = await res.json();
                 if (res.ok) {
                     authToken = data.access_token;
@@ -445,12 +443,8 @@
             const username = document.getElementById('reg-username').value;
             const email = document.getElementById('reg-email').value;
             const password = document.getElementById('reg-password').value;
-
             try {
-                const res = await fetch(`${API}/auth/register?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
-                    method: 'POST'
-                });
-
+                const res = await fetch(`${API}/auth/register?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, { method: 'POST' });
                 const data = await res.json();
                 if (res.ok) {
                     showToast('Account created! Please sign in.', 'success');
@@ -466,19 +460,15 @@
         async function handleForgot(e) {
             e.preventDefault();
             const email = document.getElementById('forgot-email').value;
-
             try {
-                const res = await fetch(`${API}/auth/forgot-password?email=${encodeURIComponent(email)}`, {
-                    method: 'POST'
-                });
-
+                const res = await fetch(`${API}/auth/forgot-password?email=${encodeURIComponent(email)}`, { method: 'POST' });
                 const data = await res.json();
                 if (res.ok) {
                     document.getElementById('reset-token-value').textContent = data.reset_token;
                     document.getElementById('reset-token-display').classList.remove('hidden');
                     showToast('Reset token generated!', 'success');
                 } else {
-                    showToast(data.detail || 'Failed to generate token', 'error');
+                    showToast(data.detail || 'Failed', 'error');
                 }
             } catch (e) {
                 showToast('Connection error', 'error');
@@ -489,12 +479,8 @@
             e.preventDefault();
             const token = document.getElementById('reset-token').value;
             const password = document.getElementById('reset-password').value;
-
             try {
-                const res = await fetch(`${API}/auth/reset-password?token=${encodeURIComponent(token)}&new_password=${encodeURIComponent(password)}`, {
-                    method: 'POST'
-                });
-
+                const res = await fetch(`${API}/auth/reset-password?token=${encodeURIComponent(token)}&new_password=${encodeURIComponent(password)}`, { method: 'POST' });
                 const data = await res.json();
                 if (res.ok) {
                     showToast('Password reset successful!', 'success');
@@ -515,27 +501,10 @@
             showToast('Logged out', 'success');
         }
 
-        // File Handling
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add('dragover');
-        }
-
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('dragover');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file) setFile(file);
-        }
-
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if (file) setFile(file);
-        }
+        function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+        function handleDrop(e) { e.preventDefault(); e.currentTarget.classList.remove('dragover'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); }
+        function handleFileSelect(e) { if (e.target.files[0]) setFile(e.target.files[0]); }
 
         function setFile(file) {
             currentFile = file;
@@ -561,47 +530,95 @@
         }
 
         function updateAnalyzeButton() {
-            const btn = document.getElementById('analyze-btn');
-            const instructions = document.getElementById('instructions').value.trim();
-            btn.disabled = !currentFile || !instructions;
+            document.getElementById('analyze-btn').disabled = !currentFile || !document.getElementById('instructions').value.trim();
+        }
+
+        function setTemplate(text) {
+            document.getElementById('instructions').value = text;
+            updateAnalyzeButton();
         }
 
         document.getElementById('instructions').addEventListener('input', updateAnalyzeButton);
 
-        // Document Analysis
         async function analyzeDocument() {
             if (!currentFile || !authToken) return;
 
             const btn = document.getElementById('analyze-btn');
             const btnText = document.getElementById('analyze-text');
             const btnLoading = document.getElementById('analyze-loading');
+            const output = document.getElementById('analysis-output');
+            const model = document.getElementById('model-select').value;
+            const streaming = document.getElementById('stream-toggle').checked;
 
             btn.disabled = true;
             btnText.classList.add('hidden');
             btnLoading.classList.remove('hidden');
 
+            document.getElementById('results-placeholder').classList.add('hidden');
+            document.getElementById('results-content').classList.remove('hidden');
+            document.getElementById('copy-section').classList.add('hidden');
+            output.innerHTML = '';
+
+            const modelName = document.getElementById('model-select').options[document.getElementById('model-select').selectedIndex].text.split('—')[0].trim();
+            document.getElementById('model-badge').textContent = modelName;
+            document.getElementById('model-badge').classList.remove('hidden');
+
             const formData = new FormData();
             formData.append('file', currentFile);
             formData.append('instructions', document.getElementById('instructions').value);
+            formData.append('model', model);
 
             try {
-                const res = await fetch(`${API}/auth/analyze`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${authToken}` },
-                    body: formData
-                });
+                if (streaming) {
+                    const response = await fetch(`${API}/auth/analyze/stream`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${authToken}` },
+                        body: formData
+                    });
 
-                const data = await res.json();
-                if (res.ok) {
-                    document.getElementById('results-placeholder').classList.add('hidden');
-                    document.getElementById('results-content').classList.remove('hidden');
-                    document.getElementById('analysis-output').textContent = data.analysis;
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+
+                        const chunk = decoder.decode(value);
+                        const lines = chunk.split('\n');
+
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                try {
+                                    const data = JSON.parse(line.slice(6));
+                                    if (data.text) {
+                                        output.textContent += data.text;
+                                        output.scrollTop = output.scrollHeight;
+                                    }
+                                    if (data.done) {
+                                        document.getElementById('copy-section').classList.remove('hidden');
+                                    }
+                                } catch (e) {}
+                            }
+                        }
+                    }
                     showToast('Analysis complete!', 'success');
                 } else {
-                    showToast(data.detail || 'Analysis failed', 'error');
+                    const res = await fetch(`${API}/auth/analyze`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${authToken}` },
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        output.textContent = data.analysis;
+                        document.getElementById('copy-section').classList.remove('hidden');
+                        showToast('Analysis complete!', 'success');
+                    } else {
+                        showToast(data.detail || 'Analysis failed', 'error');
+                    }
                 }
             } catch (e) {
-                showToast('Connection error', 'error');
+                showToast('Connection error: ' + e.message, 'error');
             } finally {
                 btn.disabled = false;
                 btnText.classList.remove('hidden');
@@ -610,32 +627,28 @@
             }
         }
 
-        // Toast
+        function copyResults() {
+            const text = document.getElementById('analysis-output').textContent;
+            navigator.clipboard.writeText(text);
+            showToast('Copied to clipboard!', 'success');
+        }
+
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
-            const icon = document.getElementById('toast-icon');
-            const msg = document.getElementById('toast-message');
-
             const icons = {
                 success: '<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>',
                 error: '<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>',
                 info: '<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
             };
-
-            icon.innerHTML = icons[type] || icons.info;
-            msg.textContent = message;
-
+            document.getElementById('toast-icon').innerHTML = icons[type] || icons.info;
+            document.getElementById('toast-message').textContent = message;
             toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
         }
 
-        // Init
         updateNav();
-        if (authToken) {
-            showPage('dashboard');
-        } else {
-            showPage('landing');
-        }
+        if (authToken) showPage('dashboard');
+        else showPage('landing');
     </script>
 </body>
 </html>
