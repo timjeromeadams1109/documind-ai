@@ -1171,7 +1171,8 @@ Provide your analysis."""
         try:
             response = await client.post(
                 f"{OLLAMA_URL}/api/generate",
-                json={"model": model, "prompt": prompt, "stream": False}
+                json={"model": model, "prompt": prompt, "stream": False},
+                headers={"ngrok-skip-browser-warning": "true"}
             )
             result = response.json()
         except Exception as e:
