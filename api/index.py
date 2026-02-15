@@ -444,7 +444,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 
                         <div class="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style="animation-delay: 0.2s;">
                             <button onclick="showPage('register')" class="px-8 py-4 rounded-2xl btn-primary text-white font-semibold text-lg inline-flex items-center justify-center gap-2 group">
-                                Start Analyzing Free
+                                Start Analyzing
                                 <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                                 </svg>
@@ -523,7 +523,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                                 <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
                                 <p class="text-zinc-400 mb-8 max-w-xl mx-auto">Create your free account and start analyzing documents with AI in seconds.</p>
                                 <button onclick="showPage('register')" class="px-8 py-4 rounded-2xl btn-primary text-white font-semibold text-lg">
-                                    Create Free Account
+                                    Create Account
                                 </button>
                             </div>
                         </div>
