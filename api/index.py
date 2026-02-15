@@ -40,7 +40,7 @@ OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 users_db = {}
 reset_tokens = {}
 
-app = FastAPI(title="ATSai - Document Analysis")
+app = FastAPI(title="ATSReview.ai - Document Analysis")
 
 app.add_middleware(
     CORSMiddleware,
@@ -163,7 +163,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATSai - AI Document Analysis</title>
+    <title>ATSReview.ai - AI Document Analysis</title>
     <meta name="description" content="Analyze documents with AI precision. Extract insights, summarize content, and get intelligent recommendations.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔬</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -401,7 +401,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                                 </svg>
                             </div>
-                            <span class="text-xl font-bold gradient-text">ATSai</span>
+                            <span class="text-xl font-bold gradient-text">ATSReview.ai</span>
                         </a>
 
                         <!-- Nav Links -->
@@ -539,7 +539,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                                 </svg>
                             </div>
-                            <span class="font-semibold gradient-text">ATSai</span>
+                            <span class="font-semibold gradient-text">ATSReview.ai</span>
                         </div>
                         <div class="text-sm text-zinc-500">AI-Powered Document Analysis</div>
                         <a href="/docs" class="text-sm text-zinc-400 hover:text-brand-400 transition-colors">API Documentation</a>
@@ -558,7 +558,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                                 </svg>
                             </div>
                             <h2 class="text-2xl font-bold text-white">Welcome back</h2>
-                            <p class="text-zinc-400 mt-1">Sign in to continue to ATSai</p>
+                            <p class="text-zinc-400 mt-1">Sign in to continue to ATSReview.ai</p>
                         </div>
 
                         <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
@@ -879,7 +879,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 
     <script>
         const API = '';
-        let authToken = localStorage.getItem('atsai_token');
+        let authToken = localStorage.getItem('atsreview_token');
         let currentFile = null;
 
         // Page Navigation
@@ -939,7 +939,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                 const data = await res.json();
                 if (res.ok) {
                     authToken = data.access_token;
-                    localStorage.setItem('atsai_token', authToken);
+                    localStorage.setItem('atsreview_token', authToken);
                     updateNav();
                     showPage('dashboard');
                     showToast('Welcome back!', 'success');
@@ -1023,7 +1023,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 
         function logout() {
             authToken = null;
-            localStorage.removeItem('atsai_token');
+            localStorage.removeItem('atsreview_token');
             updateNav();
             showPage('landing');
             showToast('Logged out', 'success');
