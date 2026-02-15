@@ -9,6 +9,26 @@ import secrets
 import httpx
 import json
 import os
+import io
+
+# Document parsing imports
+try:
+    from pypdf import PdfReader
+    PDF_SUPPORT = True
+except ImportError:
+    PDF_SUPPORT = False
+
+try:
+    from docx import Document as DocxDocument
+    DOCX_SUPPORT = True
+except ImportError:
+    DOCX_SUPPORT = False
+
+try:
+    import ezdxf
+    DXF_SUPPORT = True
+except ImportError:
+    DXF_SUPPORT = False
 
 # Config
 SECRET_KEY = os.environ.get("SECRET_KEY", "your-secret-key-change-in-production")
@@ -53,6 +73,90 @@ def verify_token(token: str) -> str:
         return username
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+def extract_text_from_file(content: bytes, filename: str) -> str:
+    """Extract text from various file formats."""
+    ext = filename.lower().split('.')[-1] if '.' in filename else ''
+
+    # PDF files
+    if ext == 'pdf':
+        if not PDF_SUPPORT:
+            raise HTTPException(status_code=400, detail="PDF support not available")
+        try:
+            reader = PdfReader(io.BytesIO(content))
+            text_parts = []
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    text_parts.append(text)
+            return '\n'.join(text_parts)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to parse PDF: {str(e)}")
+
+    # Word documents
+    elif ext in ['docx', 'doc']:
+        if not DOCX_SUPPORT:
+            raise HTTPException(status_code=400, detail="Word document support not available")
+        try:
+            doc = DocxDocument(io.BytesIO(content))
+            text_parts = []
+            for para in doc.paragraphs:
+                if para.text.strip():
+                    text_parts.append(para.text)
+            # Also extract text from tables
+            for table in doc.tables:
+                for row in table.rows:
+                    row_text = ' | '.join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                    if row_text:
+                        text_parts.append(row_text)
+            return '\n'.join(text_parts)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to parse Word document: {str(e)}")
+
+    # DXF/CAD files
+    elif ext in ['dxf']:
+        if not DXF_SUPPORT:
+            raise HTTPException(status_code=400, detail="DXF support not available")
+        try:
+            doc = ezdxf.read(io.BytesIO(content))
+            text_parts = []
+            text_parts.append(f"DXF File: {filename}")
+            text_parts.append(f"DXF Version: {doc.dxfversion}")
+
+            # Extract layers
+            layers = [layer.dxf.name for layer in doc.layers]
+            text_parts.append(f"Layers: {', '.join(layers)}")
+
+            # Extract text entities
+            msp = doc.modelspace()
+            for entity in msp:
+                if entity.dxftype() == 'TEXT':
+                    text_parts.append(f"Text: {entity.dxf.text}")
+                elif entity.dxftype() == 'MTEXT':
+                    text_parts.append(f"MText: {entity.text}")
+                elif entity.dxftype() == 'INSERT':
+                    text_parts.append(f"Block: {entity.dxf.name}")
+
+            # Summary of entities
+            entity_counts = {}
+            for entity in msp:
+                etype = entity.dxftype()
+                entity_counts[etype] = entity_counts.get(etype, 0) + 1
+            text_parts.append(f"Entity counts: {entity_counts}")
+
+            return '\n'.join(text_parts)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to parse DXF file: {str(e)}")
+
+    # Text-based files (txt, md, json, csv, code files, etc.)
+    else:
+        try:
+            return content.decode('utf-8')
+        except UnicodeDecodeError:
+            try:
+                return content.decode('latin-1')
+            except:
+                raise HTTPException(status_code=400, detail="Unable to read file. Supported formats: PDF, DOCX, DXF, TXT, MD, JSON, CSV, and code files.")
 
 HTML_TEMPLATE = '''<!DOCTYPE html>
 <html lang="en" class="dark">
@@ -657,14 +761,14 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                             <div id="drop-zone" class="file-drop rounded-2xl p-8 text-center cursor-pointer mb-6 group"
                                 onclick="document.getElementById('file-input').click()"
                                 ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                                <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)" accept=".txt,.md,.json,.csv,.xml,.html,.py,.js,.ts,.jsx,.tsx,.go,.rs,.java,.c,.cpp,.h,.yaml,.yml,.toml,.ini,.cfg,.log">
+                                <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)" accept=".pdf,.docx,.doc,.dxf,.txt,.md,.json,.csv,.xml,.html,.py,.js,.ts,.jsx,.tsx,.go,.rs,.java,.c,.cpp,.h,.yaml,.yml,.toml,.ini,.cfg,.log">
                                 <div class="w-16 h-16 rounded-2xl bg-zinc-800/50 flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-500/20 transition-colors">
                                     <svg class="w-8 h-8 text-zinc-500 group-hover:text-brand-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
                                 </div>
                                 <p class="text-zinc-300 mb-1 font-medium">Drag & drop or click to upload</p>
-                                <p class="text-zinc-500 text-sm">Supports TXT, MD, JSON, CSV, code files, and more</p>
+                                <p class="text-zinc-500 text-sm">PDF, Word, DXF/CAD, TXT, code files, and more</p>
                             </div>
 
                             <div id="file-info" class="hidden mb-6 p-4 rounded-xl bg-brand-500/10 border border-brand-500/20">
@@ -1151,10 +1255,7 @@ async def analyze_document(
     verify_token(token)
 
     content = await file.read()
-    try:
-        text_content = content.decode('utf-8')
-    except UnicodeDecodeError:
-        raise HTTPException(status_code=400, detail="File must be text-based")
+    text_content = extract_text_from_file(content, file.filename)
 
     prompt = f"""You are an expert document analyst. Analyze the following document according to the user's instructions.
 
