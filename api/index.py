@@ -179,5 +179,3 @@ Provide your analysis."""
         "model": model
     }
 
-# Vercel handler
-handler = app
