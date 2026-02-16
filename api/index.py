@@ -30,11 +30,18 @@ try:
 except ImportError:
     DXF_SUPPORT = False
 
+try:
+    import anthropic
+    CLAUDE_SUPPORT = True
+except ImportError:
+    CLAUDE_SUPPORT = False
+
 # Config
 SECRET_KEY = os.environ.get("SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 # In-memory store (for demo - use a real DB in production)
 users_db = {}
@@ -794,9 +801,11 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-zinc-300 mb-3">AI Model</label>
                                 <select id="model-select" class="w-full px-4 py-3.5 rounded-xl input-field text-white appearance-none cursor-pointer pr-12">
-                                    <option value="mistral:latest">Mistral 7B — Best for general analysis</option>
-                                    <option value="llama3.2:latest">Llama 3.2 — Balanced performance</option>
-                                    <option value="deepseek-coder:6.7b">DeepSeek Coder — Code review & technical</option>
+                                    <option value="claude-sonnet">Claude Sonnet — Most capable analysis</option>
+                                    <option value="claude-haiku">Claude Haiku — Fast & efficient</option>
+                                    <option value="mistral:latest">Mistral 7B — Local general analysis</option>
+                                    <option value="llama3.2:latest">Llama 3.2 — Local balanced</option>
+                                    <option value="deepseek-coder:6.7b">DeepSeek Coder — Local code review</option>
                                 </select>
                             </div>
 
@@ -1240,6 +1249,8 @@ async def reset_password(token: str, new_password: str):
 @app.get("/auth/models")
 async def list_models():
     return {"models": {
+        "claude-sonnet": {"name": "Claude Sonnet", "type": "claude"},
+        "claude-haiku": {"name": "Claude Haiku", "type": "claude"},
         "mistral:latest": {"name": "Mistral 7B", "type": "general"},
         "llama3.2:latest": {"name": "Llama 3.2", "type": "general"},
         "deepseek-coder:6.7b": {"name": "DeepSeek Coder", "type": "code"}
@@ -1249,7 +1260,7 @@ async def list_models():
 async def analyze_document(
     instructions: str = Form(...),
     file: UploadFile = File(...),
-    model: str = Form(default="mistral:latest"),
+    model: str = Form(default="claude-sonnet"),
     token: str = Depends(oauth2_scheme)
 ):
     verify_token(token)
@@ -1268,20 +1279,40 @@ DOCUMENT ({file.filename}):
 
 Provide your analysis."""
 
-    async with httpx.AsyncClient(timeout=300.0) as client:
+    # Use Claude API for Claude models
+    if model.startswith("claude-"):
+        if not CLAUDE_SUPPORT or not ANTHROPIC_API_KEY:
+            raise HTTPException(status_code=400, detail="Claude API not configured")
+
         try:
-            response = await client.post(
-                f"{OLLAMA_URL}/api/generate",
-                json={"model": model, "prompt": prompt, "stream": False},
-                headers={"ngrok-skip-browser-warning": "true"}
+            client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+            model_id = "claude-sonnet-4-20250514" if model == "claude-sonnet" else "claude-haiku-4-20250514"
+
+            message = client.messages.create(
+                model=model_id,
+                max_tokens=4096,
+                messages=[{"role": "user", "content": prompt}]
             )
-            result = response.json()
+            analysis_result = message.content[0].text
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Claude API error: {str(e)}")
+    else:
+        # Use Ollama for other models
+        async with httpx.AsyncClient(timeout=300.0) as client:
+            try:
+                response = await client.post(
+                    f"{OLLAMA_URL}/api/generate",
+                    json={"model": model, "prompt": prompt, "stream": False},
+                    headers={"ngrok-skip-browser-warning": "true"}
+                )
+                result = response.json()
+                analysis_result = result.get("response", "No response from AI")
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
     return {
         "filename": file.filename,
         "instructions": instructions,
-        "analysis": result.get("response", "No response from AI"),
+        "analysis": analysis_result,
         "model": model
     }
