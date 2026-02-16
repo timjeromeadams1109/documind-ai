@@ -821,6 +821,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-zinc-300 mb-3">Quick Templates</label>
                                 <div class="flex flex-wrap gap-2">
+                                    <button onclick="setSimpsonTemplate()" class="px-3 py-2 rounded-lg bg-gradient-to-r from-red-600/20 to-orange-600/20 border border-red-500/50 text-sm text-red-400 hover:border-red-400 hover:text-red-300 transition-all font-medium">Simpson Products</button>
                                     <button onclick="setTemplate('Summarize the main points and key takeaways')" class="px-3 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-sm text-zinc-300 hover:border-brand-500/50 hover:text-brand-400 transition-all">Summarize</button>
                                     <button onclick="setTemplate('Extract all numerical data, dates, and metrics')" class="px-3 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-sm text-zinc-300 hover:border-brand-500/50 hover:text-brand-400 transition-all">Extract Data</button>
                                     <button onclick="setTemplate('Identify risks, issues, and areas of concern')" class="px-3 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-sm text-zinc-300 hover:border-brand-500/50 hover:text-brand-400 transition-all">Find Risks</button>
@@ -1101,6 +1102,37 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 
         function setTemplate(text) {
             document.getElementById('instructions').value = text;
+            updateAnalyzeButton();
+        }
+
+        function setSimpsonTemplate() {
+            const simpsonPrompt = `Analyze this document as a Simpson Strong-Tie product specialist. Provide:
+
+1. **SIMPSON PRODUCT RECOMMENDATIONS**
+   - Identify all construction/building applications mentioned
+   - Recommend specific Simpson Strong-Tie products for each application
+   - Include product codes/model numbers where applicable (e.g., HD2A, LUS26, A35, LSTA, etc.)
+
+2. **UPSELL OPPORTUNITIES**
+   - Identify complementary Simpson products that could enhance the project
+   - Suggest premium alternatives or upgrades
+   - Highlight any code compliance products that may be required
+   - Recommend Simpson fasteners, adhesives, or accessories that pair with main products
+
+3. **PRODUCT CATEGORIES TO CONSIDER**
+   - Connectors (joist hangers, post bases, straps, angles)
+   - Fastening systems (Strong-Drive screws, nails, anchors)
+   - Lateral systems (hold-downs, shear walls, bracing)
+   - Concrete/masonry products (anchors, epoxy, retrofit)
+   - Outdoor/deck products (post caps, column bases)
+
+4. **VALUE-ADD RECOMMENDATIONS**
+   - Installation tools or accessories
+   - Code compliance documentation needed
+   - Engineering/technical support available
+
+Format the response with clear sections and specific product recommendations.`;
+            document.getElementById('instructions').value = simpsonPrompt;
             updateAnalyzeButton();
         }
 
